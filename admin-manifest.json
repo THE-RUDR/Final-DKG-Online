@@ -1,0 +1,26 @@
+{
+  "name": "DKG Online Admin",
+  "short_name": "DKG Admin",
+  "description": "Principal desktop dashboard for DKG Online.",
+  "start_url": "./admin.html",
+  "display": "standalone",
+  "orientation": "landscape",
+  "theme_color": "#0D0D0D",
+  "background_color": "#0D0D0D",
+  "lang": "en",
+  "scope": "./",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

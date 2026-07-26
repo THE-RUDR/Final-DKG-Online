@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Install DKG Admin</title>
+  <meta name="theme-color" content="#0D0D0D">
+  <link rel="manifest" href="admin-manifest.json">
+  <link rel="apple-touch-icon" href="icon-192.png">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+      font-family: Arial, Helvetica, sans-serif;
+      color: #fff;
+      background: #0d0d0d;
+    }
+    main {
+      width: min(560px, 100%);
+      overflow: hidden;
+      border: 1px solid rgba(255, 204, 0, 0.22);
+      border-radius: 16px;
+      background: linear-gradient(145deg, #202020, #121212);
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.38);
+    }
+    .hero {
+      padding: 32px 24px 24px;
+      text-align: center;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    img {
+      width: 96px;
+      height: 96px;
+      object-fit: contain;
+      filter: drop-shadow(0 12px 24px rgba(255, 204, 0, 0.18));
+    }
+    h1 {
+      margin: 16px 0 8px;
+      font-size: 30px;
+    }
+    p {
+      margin: 0;
+      color: #a8a8ad;
+      line-height: 1.5;
+    }
+    .content {
+      display: grid;
+      gap: 14px;
+      padding: 24px;
+    }
+    .button {
+      min-height: 54px;
+      border: 0;
+      border-radius: 10px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      background: linear-gradient(135deg, #ffcc00, #ff9900);
+      color: #111;
+      cursor: pointer;
+      font-size: 17px;
+      font-weight: 900;
+      text-decoration: none;
+    }
+    .button.secondary {
+      background: rgba(255, 255, 255, 0.06);
+      color: #fff;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    .button svg { width: 20px; height: 20px; }
+    .note {
+      padding: 14px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.04);
+      color: #b8b8bd;
+      font-size: 14px;
+    }
+    .note strong {
+      display: block;
+      margin-bottom: 5px;
+      color: #ffcc00;
+    }
+    @media (max-width: 899px), (pointer: coarse) and (max-width: 1024px) {
+      body::before {
+        content: "Admin panel is desktop/laptop only.";
+        position: fixed;
+        inset: 0;
+        display: grid;
+        place-items: center;
+        padding: 24px;
+        background: #0d0d0d;
+        color: #ffcc00;
+        z-index: 3;
+        text-align: center;
+        font-size: 22px;
+        font-weight: 900;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <section class="hero">
+      <img src="icon-512.png" alt="DKG Admin">
+      <h1>DKG Online Admin</h1>
+      <p>Install the principal desktop dashboard.</p>
+    </section>
+    <section class="content">
+      <button class="button" id="install-admin">
+        <i data-lucide="download"></i>
+        Install Admin Panel
+      </button>
+      <a class="button secondary" href="admin.html">
+        <i data-lucide="monitor"></i>
+        Open Admin Panel
+      </a>
+      <div class="note" id="install-note">
+        <strong>Desktop install</strong>
+        Open this link in Chrome or Edge on desktop, then click Install Admin Panel.
+      </div>
+    </section>
+  </main>
+
+  <script>
+    let deferredPrompt = null;
+    const installButton = document.getElementById('install-admin');
+    const note = document.getElementById('install-note');
+
+    window.addEventListener('beforeinstallprompt', event => {
+      event.preventDefault();
+      deferredPrompt = event;
+      installButton.disabled = false;
+    });
+
+    installButton.addEventListener('click', async () => {
+      if (!deferredPrompt) {
+        note.innerHTML = '<strong>Install option</strong>Use the browser address-bar install icon or menu: Install DKG Online Admin.';
+        return;
+      }
+      deferredPrompt.prompt();
+      await deferredPrompt.userChoice;
+      deferredPrompt = null;
+    });
+
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./service-worker.js').catch(() => {});
+      });
+    }
+
+    if (window.lucide) window.lucide.createIcons();
+  </script>
+</body>
+</html>

@@ -1,0 +1,18 @@
+services:
+  - type: web
+    name: dkg-online
+    env: node
+    plan: free
+    buildCommand: ""
+    startCommand: "node server.js"
+    disk:
+      name: dkg-online-data
+      mountPath: /var/data
+      sizeGB: 1
+    envVars:
+      - key: HOST
+        value: 0.0.0.0
+      - key: PORT
+        value: 10000
+      - key: DKG_STORAGE_DIR
+        value: /var/data

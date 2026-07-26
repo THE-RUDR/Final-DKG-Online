@@ -1,0 +1,421 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>DKG Online - Attendance Tracker</title>
+
+  <!-- PWA: Web App Manifest -->
+  <link rel="manifest" href="manifest.json">
+
+  <!-- PWA: iOS Safari meta tags -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="DKG Online">
+  <link rel="apple-touch-icon" href="icon-192.png">
+
+  <!-- PWA: Theme color for Android Chrome toolbar -->
+  <meta name="theme-color" content="#FFCC00">
+  <meta name="description" content="Smart attendance management system for teachers.">
+
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="styles.css">
+
+  <!-- jsPDF for report exports -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="icon-fallback.js"></script>
+  <script src="backend-config.js"></script>
+</head>
+<body>
+  <div class="teacher-login-overlay" id="teacher-login-overlay">
+    <form class="teacher-login-card" id="teacher-login-form" autocomplete="off">
+      <img src="icon-192.png" alt="DKG Online">
+      <p class="teacher-login-eyebrow">Teacher Access</p>
+      <h1>DKG Online</h1>
+      <input type="password" id="teacher-password" class="teacher-password-input" placeholder="Enter Password" autocomplete="current-password">
+      <button class="btn-primary teacher-login-button" type="submit">
+        <i data-lucide="lock-keyhole"></i>
+        Unlock App
+      </button>
+      <p class="teacher-login-error" id="teacher-login-error"></p>
+    </form>
+  </div>
+
+  <!-- Smartphone Device Mockup Shell (Desktop Only, responsive to 100% on Mobile) -->
+  <div class="phone-mockup">
+    
+    <!-- Smartphone Camera Notch -->
+    <div class="status-bar-notch"></div>
+    
+    <!-- Simulated Smartphone Status Bar -->
+    <div class="phone-status-bar">
+      <div class="status-bar-time">12:30 PM</div>
+      <div class="status-bar-icons">
+        <i data-lucide="wifi"></i>
+        <i data-lucide="signal"></i>
+        <i data-lucide="battery"></i>
+      </div>
+    </div>
+    
+    <!-- App Header -->
+    <header class="app-header">
+      <div class="logo">
+        <i data-lucide="shield-check" style="stroke: #FFCC00; stroke-width: 2.5;"></i>
+        <span>DKG Online</span>
+      </div>
+      <div class="header-actions">
+        <!-- Theme Toggle Switch (Light/Dark Mode) -->
+        <div class="offline-toggle-container" style="cursor: pointer;">
+          <span class="offline-label" style="color: var(--color-text-primary);">Light Mode</span>
+          <label class="offline-switch">
+            <input type="checkbox" id="theme-toggle">
+            <span class="slider"></span>
+          </label>
+        </div>
+      </div>
+    </header>
+
+    <!-- Toast Notification Container -->
+    <div class="toast-container" id="toast-container"></div>
+
+    <!-- Fullscreen Success Overlay (For Attendance submissions / updates) -->
+    <div class="success-overlay" id="success-overlay">
+      <div class="success-circle">
+        <i data-lucide="check"></i>
+      </div>
+      <h2 class="success-title">Attendance Logged!</h2>
+      <p class="success-subtitle">Roster submitted and saved successfully.</p>
+      
+      <!-- Live Class Attendance Graph -->
+      <div id="success-chart-container" style="width: 100%; max-width: 280px; margin-top: 15px; display: flex; flex-direction: column; gap: 12px;">
+        <!-- Rendered dynamically in app.js -->
+      </div>
+      
+      <button class="btn-primary" id="btn-close-success" style="margin-top: 20px; padding: 10px 24px; font-size: 13px;">
+        Continue
+      </button>
+    </div>
+
+    <!-- Main View Scrollable Container -->
+    <main class="view-container" id="view-container">
+
+      <!-- - VIEW 1: DASHBOARD -->
+      <section class="app-view active" id="view-dashboard">
+        <!-- Welcome header -->
+        <div class="dashboard-welcome">
+          <div>
+            <h2 class="teacher-title">Welcome Back To DKG World</h2>
+            <p class="today-date" id="today-date-text">Monday, Jun 28, 2026</p>
+          </div>
+          <div style="background: rgba(255,255,255,0.05); padding: 8px; border-radius: 12px; border: var(--border-dim);">
+            <i data-lucide="calendar" style="color: var(--accent-yellow); width: 20px; height: 20px;"></i>
+          </div>
+        </div>
+
+        <!-- Total Metrics Grid -->
+        <div class="metrics-grid">
+          <div class="premium-card metric-card-large">
+            <div class="metric-info">
+              <h3>Total Students Managed</h3>
+              <div class="metric-value" id="dash-total-students">72</div>
+            </div>
+            <div class="metric-icon-box">
+              <i data-lucide="users"></i>
+            </div>
+          </div>
+
+          <div class="premium-card metric-card-small">
+            <div class="metric-info">
+              <h3>Today's Attendance</h3>
+              <div class="metric-value" id="dash-attendance-pct">94%</div>
+            </div>
+          </div>
+
+          <div class="premium-card metric-card-small alert">
+            <div class="metric-info">
+              <h3>Absence Alerts</h3>
+              <div class="metric-value" id="dash-absence-alerts">4</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Daily Analytics Graph -->
+        <div class="premium-card chart-card">
+          <div class="chart-header">
+            <h3>Weekly Attendance</h3>
+            <div style="font-size: 10px; color: var(--accent-yellow); font-weight: 700; background: rgba(255,204,0,0.08); padding: 2px 6px; border-radius: 8px;">
+              Target: 75%
+            </div>
+          </div>
+          <div class="chart-container">
+            <svg class="chart-svg" id="weekly-chart-svg" viewBox="0 0 360 130">
+              <defs>
+                <linearGradient id="chart-gradient" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="var(--accent-yellow)" />
+                  <stop offset="100%" stop-color="var(--accent-yellow)" stop-opacity="0" />
+                </linearGradient>
+              </defs>
+            </svg>
+            <div class="chart-x-labels">
+              <!-- Rendered dynamically in app.js -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Quick Actions / Navigation Shortcut -->
+        <div class="premium-card quick-actions-card" style="border: var(--border-glow); box-shadow: var(--glow-shadow);">
+          <button class="btn-primary" id="btn-get-attendance" style="width: 100%;">
+            <i data-lucide="clipboard-check"></i> Get Attendance
+          </button>
+        </div>
+      </section>
+
+      <!-- - VIEW 2: ATTENDANCE (3-STEP DRILL DOWN FLOW) -->
+      <section class="app-view" id="view-attendance">
+        <div class="attendance-step-header">
+          <div class="step-indicator" id="attendance-step-indicator">
+            <span>Roll Call</span>
+            <div class="step-dot active"></div>
+            <div class="step-dot"></div>
+            <div class="step-dot"></div>
+          </div>
+          <h2 class="step-title" id="attendance-step-title">Select Class</h2>
+        </div>
+
+        <!-- Step 1: Class Selection Grid -->
+        <div class="classes-grid" id="attendance-class-selection">
+          <!-- Rendered dynamically in app.js -->
+        </div>
+
+        <!-- Step 2: Division Selection Grid -->
+        <div class="divisions-grid" id="attendance-division-selection" style="display: none;">
+          <!-- Rendered dynamically in app.js -->
+        </div>
+
+        <!-- Step 3: Student Roll Call List -->
+        <div class="student-roster-container" id="attendance-student-roster" style="display: none; flex-direction: column; gap: 14px;">
+          <!-- Rendered dynamically in app.js -->
+        </div>
+      </section>
+
+      <!-- - VIEW 3: HISTORY & STATS -->
+      <section class="app-view" id="view-history">
+        <div style="display: flex; flex-direction: column; gap: 6px;">
+          <span style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--color-text-secondary);">Attendance Records</span>
+          <h2 style="font-family: var(--font-title); font-size: 22px; font-weight: 700;">History Reports</h2>
+        </div>
+
+        <!-- Date Picker (Always visible at the top of History) -->
+        <div class="date-selector-container">
+          <div class="date-input-wrapper">
+            <i data-lucide="calendar"></i>
+            <input type="date" class="date-picker-input" id="history-date-input">
+          </div>
+        </div>
+
+        <!-- History Drill-Down Flow Container -->
+        <div id="history-flow-container" style="display: flex; flex-direction: column; gap: 16px;">
+          <!-- Step 1: Classes Grid, Step 2: Divisions Grid, Step 3: Stats Report. Rendered in app.js -->
+        </div>
+      </section>
+
+      <!-- - VIEW 4: TODAY'S REPORTS -->
+      <section class="app-view" id="view-reports">
+        <div style="display: flex; flex-direction: column; gap: 6px;">
+          <span style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--color-text-secondary);">Today's Absentees</span>
+          <h2 style="font-family: var(--font-title); font-size: 22px; font-weight: 700;">Today's Reports</h2>
+        </div>
+
+        <!-- Filters Block -->
+        <div class="premium-card" style="display: flex; flex-direction: column; gap: 12px; padding: 14px;">
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+            <div class="form-group">
+              <label class="form-label">Class</label>
+              <select class="form-select" id="reports-class-select">
+                <!-- Populated in app.js -->
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Division</label>
+              <select class="form-select" id="reports-div-select">
+                <!-- Populated in app.js -->
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Today's Absentee List -->
+        <div class="report-list" id="reports-container" style="margin-top: 15px;">
+          <!-- Rendered dynamically in app.js -->
+        </div>
+      </section>
+
+      <!-- - VIEW 5: MANAGE (Add/Remove Students, Classes, Divisions) -->
+      <section class="app-view" id="view-manage">
+        <div class="section-title">
+          <i data-lucide="settings-2"></i> Manage Hub
+        </div>
+
+        <!-- Group 1: Students -->
+        <div class="manage-group" style="margin-bottom: 12px;">
+          <button class="manage-accordion-btn" data-target="students">
+            <span style="display: flex; align-items: center; gap: 10px;">
+              <i data-lucide="users"></i> Manage Students
+            </span>
+            <i data-lucide="chevron-down" class="chevron"></i>
+          </button>
+          <div class="manage-accordion-content" id="panel-students">
+            <div class="manage-add-form" id="manage-form-students">
+              <select id="manage-student-class" class="manage-select">
+                <option value="">Select Class</option>
+              </select>
+              <select id="manage-student-division" class="manage-select">
+                <option value="">Select Division</option>
+              </select>
+              <input type="text" id="manage-student-name" class="manage-input" placeholder="Student Full Name" />
+              <input type="text" id="manage-student-roll" class="manage-input" placeholder="Roll No (e.g. 13)" />
+              <input type="text" id="manage-student-contact" class="manage-input" placeholder="Parent Mobile No. (e.g. +91 98765 43210)" />
+              <button class="btn-primary" id="btn-add-student" style="width:100%;">
+                <i data-lucide="user-plus"></i> Add Student
+              </button>
+            </div>
+            <div class="manage-search-wrapper">
+              <i data-lucide="search"></i>
+              <input type="search" id="manage-student-search" class="manage-input manage-search-input" placeholder="Search student, roll, class, division, phone" />
+            </div>
+            <div class="manage-list" id="manage-list-students">
+              <!-- Rendered dynamically -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Group 2: Classes -->
+        <div class="manage-group" style="margin-bottom: 12px;">
+          <button class="manage-accordion-btn" data-target="classes">
+            <span style="display: flex; align-items: center; gap: 10px;">
+              <i data-lucide="graduation-cap"></i> Manage Classes
+            </span>
+            <i data-lucide="chevron-down" class="chevron"></i>
+          </button>
+          <div class="manage-accordion-content" id="panel-classes">
+            <div class="manage-add-form">
+              <input type="text" id="manage-class-name" class="manage-input" placeholder="Class Name (e.g. Class 12)" />
+              <button class="btn-primary" id="btn-add-class" style="width:100%;">
+                <i data-lucide="plus-circle"></i> Add Class
+              </button>
+            </div>
+            <div class="manage-list" id="manage-list-classes">
+              <!-- Rendered dynamically -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Group 3: Divisions -->
+        <div class="manage-group" style="margin-bottom: 12px;">
+          <button class="manage-accordion-btn" data-target="divisions">
+            <span style="display: flex; align-items: center; gap: 10px;">
+              <i data-lucide="layout-grid"></i> Manage Divisions
+            </span>
+            <i data-lucide="chevron-down" class="chevron"></i>
+          </button>
+          <div class="manage-accordion-content" id="panel-divisions">
+            <div class="manage-add-form">
+              <select id="manage-div-class" class="manage-select">
+                <option value="">Select Class</option>
+              </select>
+              <input type="text" id="manage-div-name" class="manage-input" placeholder="Division Name (e.g. Div C)" />
+              <button class="btn-primary" id="btn-add-division" style="width:100%;">
+                <i data-lucide="plus-circle"></i> Add Division
+              </button>
+            </div>
+            <div class="manage-list" id="manage-list-divisions">
+              <!-- Rendered dynamically -->
+            </div>
+          </div>
+        </div>
+
+      </section>
+
+    </main>
+
+    <!-- Sticky Bottom Navigation Bar -->
+    <nav class="bottom-nav">
+      <a class="nav-item active" data-view="dashboard">
+        <i data-lucide="layout-dashboard"></i>
+        <span>Dashboard</span>
+      </a>
+      <a class="nav-item" data-view="attendance">
+        <i data-lucide="check-square"></i>
+        <span>Attendance</span>
+      </a>
+      <a class="nav-item nav-item-add" data-view="manage" id="nav-btn-manage">
+        <div class="nav-add-circle">
+          <i data-lucide="plus"></i>
+        </div>
+      </a>
+      <a class="nav-item" data-view="history">
+        <i data-lucide="history"></i>
+        <span>History</span>
+      </a>
+      <a class="nav-item" data-view="reports">
+        <i data-lucide="clipboard-list"></i>
+        <span>Reports</span>
+      </a>
+    </nav>
+
+  </div>
+
+
+
+  <!-- Core Scripts -->
+  <script src="db.js"></script>
+  <script src="app.js"></script>
+  <script src="scroll-fix.js"></script>
+
+  <!-- PWA: Register Service Worker for offline support & auto-updates -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./service-worker.js')
+          .then(reg => {
+            console.log('[DKG PWA] Service Worker registered:', reg.scope);
+
+            // Check for updates every 60 seconds silently in background
+            setInterval(() => reg.update(), 60000);
+
+            // When a new version is waiting, activate it immediately
+            reg.addEventListener('updatefound', () => {
+              const newWorker = reg.installing;
+              newWorker.addEventListener('statechange', () => {
+                if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                  console.log('[DKG PWA] New version available - applying silently...');
+                  newWorker.postMessage({ action: 'skipWaiting' });
+                }
+              });
+            });
+          })
+          .catch(err => console.warn('[DKG PWA] SW registration failed:', err));
+
+        // Reload page when new SW takes control (seamless update)
+        let refreshing = false;
+        navigator.serviceWorker.addEventListener('controllerchange', () => {
+          if (!refreshing) {
+            refreshing = true;
+            console.log('[DKG PWA] Updated! Reloading for latest version...');
+            window.location.reload();
+          }
+        });
+      });
+    }
+  </script>
+</body>
+</html>
+
+
+
+
+
+

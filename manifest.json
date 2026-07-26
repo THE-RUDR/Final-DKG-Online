@@ -1,0 +1,50 @@
+{
+  "name": "DKG Online - Attendance Tracker",
+  "short_name": "DKG Online",
+  "description": "Smart attendance management system for teachers by DKG World.",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "orientation": "portrait",
+  "theme_color": "#FFCC00",
+  "background_color": "#0D0D0D",
+  "lang": "en",
+  "scope": "./",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["education", "productivity"],
+  "shortcuts": [
+    {
+      "name": "Take Attendance",
+      "short_name": "Attendance",
+      "description": "Go directly to attendance marking",
+      "url": "./index.html",
+      "icons": [{ "src": "icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Today's Reports",
+      "short_name": "Reports",
+      "description": "View today's absentee report",
+      "url": "./index.html",
+      "icons": [{ "src": "icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Principal Admin",
+      "short_name": "Admin",
+      "description": "Open the principal dashboard",
+      "url": "./admin.html",
+      "icons": [{ "src": "icon-192.png", "sizes": "192x192" }]
+    }
+  ]
+}

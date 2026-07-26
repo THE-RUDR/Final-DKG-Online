@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DKG Online School Install Kit</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+      font-family: Arial, Helvetica, sans-serif;
+      color: #151515;
+      background: #f5f5f5;
+    }
+    main {
+      width: min(760px, 100%);
+      overflow: hidden;
+      border: 1px solid #e2e2e2;
+      border-radius: 18px;
+      background: #fff;
+      box-shadow: 0 22px 54px rgba(0, 0, 0, 0.1);
+    }
+    .hero {
+      padding: 30px 24px;
+      text-align: center;
+      background: linear-gradient(180deg, #fff2a8, #fff);
+      border-bottom: 1px solid #ececec;
+    }
+    img {
+      width: 86px;
+      height: 86px;
+      object-fit: contain;
+      filter: drop-shadow(0 10px 18px rgba(0, 0, 0, 0.12));
+    }
+    h1 {
+      margin: 14px 0 7px;
+      font-size: 30px;
+    }
+    p {
+      margin: 0;
+      color: #5d5d5d;
+      line-height: 1.45;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+      padding: 22px;
+    }
+    a {
+      min-height: 76px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 5px;
+      padding: 16px;
+      border-radius: 12px;
+      border: 1px solid #e5e5e5;
+      background: #fafafa;
+      color: #151515;
+      text-decoration: none;
+    }
+    a.primary {
+      background: #ffcc00;
+      border-color: #e9b800;
+    }
+    strong {
+      font-size: 17px;
+    }
+    span {
+      color: #5f5f5f;
+      font-size: 13px;
+      overflow-wrap: anywhere;
+    }
+    .note {
+      margin: 0 22px 22px;
+      padding: 14px;
+      border-radius: 12px;
+      border: 1px solid #e5e5e5;
+      background: #f8f8f8;
+      color: #555;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+    @media (max-width: 620px) {
+      .grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <section class="hero">
+      <img src="https://dkg-online-app.onrender.com/icon-512.png" alt="DKG Online">
+      <h1>DKG Online</h1>
+      <p>School install links for teacher app and principal admin panel.</p>
+    </section>
+    <section class="grid single">
+      <a class="primary" href="https://dkg-online-app.onrender.com/download.html">
+        <strong>Open App Download Page</strong>
+        <span>Android APK + iPhone home screen instructions</span>
+      </a>
+      <a href="https://dkg-online-app.onrender.com/admin-install.html">
+        <strong>Install Admin Panel</strong>
+        <span>Use on desktop/laptop Chrome or Edge</span>
+      </a>
+    </section>
+    <div class="note">
+      Internet is required. Open this file from the pendrive, then click the needed button.
+      Android phones can install the APK. iPhone users should open the app link in Safari and use Add to Home Screen.
+    </div>
+  </main>
+</body>
+</html>

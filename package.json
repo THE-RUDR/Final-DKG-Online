@@ -1,0 +1,10 @@
+﻿{
+  "name": "dkg-online",
+  "version": "1.0.0",
+  "private": true,
+  "description": "DKG Online attendance app with shared backend and admin dashboard.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  }
+}

@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>DKG Online - Principal Admin</title>
+  <meta name="theme-color" content="#0D0D0D">
+  <link rel="manifest" href="admin-manifest.json">
+  <link rel="apple-touch-icon" href="icon-192.png">
+  <link rel="stylesheet" href="admin.css">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="backend-config.js"></script>
+</head>
+<body>
+  <div class="desktop-lock" id="desktop-lock">
+    <div class="lock-card">
+      <i data-lucide="monitor-x"></i>
+      <h2>Desktop Required</h2>
+      <p>Principal admin panel is available only on desktop or laptop screens.</p>
+    </div>
+  </div>
+
+  <div class="login-overlay" id="login-overlay">
+    <form class="login-card" id="admin-login-form">
+      <div class="login-icon"><i data-lucide="shield-check"></i></div>
+      <p class="eyebrow">Secure Principal Access</p>
+      <h2>DKG Admin Login</h2>
+      <p class="login-copy">Enter admin password to open school dashboard.</p>
+      <input id="admin-password" class="login-input" type="password" placeholder="Admin password" autocomplete="current-password">
+      <button class="primary-action" type="submit">
+        <i data-lucide="unlock"></i>
+        Open Admin Panel
+      </button>
+      <p class="login-error" id="login-error"></p>
+    </form>
+  </div>
+
+  <main class="admin-shell">
+    <aside class="admin-sidebar">
+      <div class="admin-brand">
+        <img src="icon-192.png" alt="DKG Online">
+        <div>
+          <p class="eyebrow">Principal</p>
+          <h1>DKG Admin</h1>
+        </div>
+      </div>
+
+      <nav class="side-nav" aria-label="Admin tabs">
+        <button class="side-nav-item active" data-admin-view="home" type="button">
+          <i data-lucide="layout-dashboard"></i>
+          <span>Home</span>
+        </button>
+        <button class="side-nav-item" data-admin-view="classes" type="button">
+          <i data-lucide="school"></i>
+          <span>Classes</span>
+        </button>
+        <button class="side-nav-item" data-admin-view="alerts" type="button">
+          <i data-lucide="bell-ring"></i>
+          <span>Alerts</span>
+        </button>
+        <button class="side-nav-item" data-admin-view="records" type="button">
+          <i data-lucide="folder-clock"></i>
+          <span>Records</span>
+        </button>
+      </nav>
+
+      <div class="sidebar-actions">
+        <button class="app-link" id="btn-export-today" type="button" title="Export today report">
+          <i data-lucide="download"></i>
+          <span>Today CSV</span>
+        </button>
+        <button class="app-link" id="btn-export-year" type="button" title="Export yearly report">
+          <i data-lucide="file-spreadsheet"></i>
+          <span>Year CSV</span>
+        </button>
+        <button class="app-link" id="btn-backup-data" type="button" title="Download full data backup">
+          <i data-lucide="database-backup"></i>
+          <span>Backup</span>
+        </button>
+        <button class="app-link" id="btn-print-report" type="button" title="Print or save PDF">
+          <i data-lucide="printer"></i>
+          <span>Print/PDF</span>
+        </button>
+        <a class="app-link" href="index.html" title="Open teacher app">
+          <i data-lucide="smartphone"></i>
+          <span>Teacher App</span>
+        </a>
+        <button class="app-link danger" id="btn-admin-logout" type="button" title="Logout">
+          <i data-lucide="log-out"></i>
+          <span>Logout</span>
+        </button>
+      </div>
+    </aside>
+
+    <section class="admin-main">
+      <header class="admin-header">
+        <div>
+          <p class="eyebrow">Live School Dashboard</p>
+          <h2 id="admin-page-title">Home</h2>
+          <p class="subline" id="admin-sync-text">Connecting to live school data...</p>
+        </div>
+        <input id="admin-date" type="date" class="date-input">
+      </header>
+
+      <section class="admin-view active" id="admin-view-home">
+        <section class="metric-grid">
+          <article class="metric-card">
+            <span>Total Students</span>
+            <strong id="metric-total-students">0</strong>
+            <small>Across all classes</small>
+          </article>
+          <article class="metric-card present">
+            <span>Present Today</span>
+            <strong id="metric-present-today">0</strong>
+            <small id="metric-present-rate">0% present</small>
+          </article>
+          <article class="metric-card absent">
+            <span>Absent Today</span>
+            <strong id="metric-absent-today">0</strong>
+            <small id="metric-absent-rate">0% absent</small>
+          </article>
+          <article class="metric-card">
+            <span>Classes</span>
+            <strong id="metric-classes">0</strong>
+            <small id="metric-divisions">0 divisions</small>
+          </article>
+        </section>
+
+        <section class="home-graph-grid">
+          <article class="panel line-panel">
+            <div class="panel-head">
+              <div>
+                <p class="eyebrow">Today Line</p>
+                <h2>Attendance Trend</h2>
+              </div>
+              <span class="pill">Last 7 days</span>
+            </div>
+            <div id="weekly-bars" class="line-chart"></div>
+          </article>
+
+          <article class="panel chart-panel">
+            <div class="panel-head">
+              <div>
+                <p class="eyebrow">Donut Graph</p>
+                <h2>Today's Presenty</h2>
+              </div>
+              <span class="pill" id="today-chart-pill">0%</span>
+            </div>
+            <div class="donut-wrap">
+              <svg viewBox="0 0 180 180" class="donut-chart" aria-label="Today attendance graph">
+                <circle cx="90" cy="90" r="68" class="donut-track"></circle>
+                <circle cx="90" cy="90" r="68" class="donut-value" id="today-donut"></circle>
+              </svg>
+              <div class="donut-label">
+                <strong id="today-donut-label">0%</strong>
+                <span>Present</span>
+              </div>
+            </div>
+          </article>
+        </section>
+      </section>
+
+      <section class="admin-view" id="admin-view-classes">
+        <article class="panel class-browser-panel">
+          <div class="panel-head">
+            <div>
+              <p class="eyebrow" id="class-browser-eyebrow">Classes</p>
+              <h2 id="class-browser-title">Classes & Class Teachers</h2>
+              <p class="subline" id="class-browser-subtitle">Open a class to view divisions and student presenty.</p>
+            </div>
+            <button class="app-link" id="btn-class-browser-back" type="button">
+              <i data-lucide="arrow-left"></i>
+              <span>Back</span>
+            </button>
+          </div>
+          <div id="class-browser-list" class="class-browser-list"></div>
+        </article>
+      </section>
+
+      <section class="admin-view" id="admin-view-alerts">
+        <section class="insight-grid">
+          <article class="panel alert-panel">
+            <div class="panel-head">
+              <div>
+                <p class="eyebrow">Action Needed</p>
+                <h2>Not Submitted Today</h2>
+              </div>
+              <span class="pill warning" id="not-submitted-count">0</span>
+            </div>
+            <div id="not-submitted-list" class="compact-list"></div>
+          </article>
+
+          <article class="panel alert-panel">
+            <div class="panel-head">
+              <div>
+                <p class="eyebrow">Absentees</p>
+                <h2>Absent Students Today</h2>
+              </div>
+              <span class="pill danger-pill" id="absent-list-count">0</span>
+            </div>
+            <div id="absent-students-list" class="compact-list"></div>
+          </article>
+        </section>
+      </section>
+
+      <section class="admin-view" id="admin-view-records">
+        <section class="records-grid">
+          <article class="panel">
+            <div class="panel-head">
+              <div>
+                <p class="eyebrow">Records</p>
+                <h2>Yearly Stored Data</h2>
+              </div>
+              <div class="filter-row">
+                <select id="filter-class" class="select-input"></select>
+                <select id="filter-division" class="select-input"></select>
+                <select id="admin-year" class="select-input"></select>
+              </div>
+            </div>
+            <div id="records-table" class="records-table"></div>
+          </article>
+
+          <article class="panel">
+            <div class="panel-head">
+              <div>
+                <p class="eyebrow">Monthly</p>
+                <h2>Monthly Attendance Report</h2>
+              </div>
+              <div class="filter-row">
+                <input id="admin-month" type="month" class="date-input">
+                <button class="app-link" id="btn-export-month" type="button" title="Export monthly report">
+                  <i data-lucide="download"></i>
+                  <span>Month CSV</span>
+                </button>
+              </div>
+            </div>
+            <div id="monthly-report-table" class="records-table"></div>
+          </article>
+        </section>
+      </section>
+    </section>
+  </main>
+
+  <script src="admin.js"></script>
+</body>
+</html>
