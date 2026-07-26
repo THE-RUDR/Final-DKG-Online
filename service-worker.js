@@ -5,7 +5,7 @@
 // - Auto-updates silently in the background on every visit
 // 
 
-const CACHE_NAME = 'dkg-online-v33';
+const CACHE_NAME = 'dkg-online-v34';
 
 // Files to pre-cache on install (app shell)
 const PRECACHE_URLS = [
